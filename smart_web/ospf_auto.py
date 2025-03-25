@@ -1,8 +1,7 @@
 import ipaddress
 import xml.etree.ElementTree as ET
 from random import choice
-
-from Configuring_the_database import config, generic, RT_before
+from Configuring_the_database import config, generic, RT_before,vlan_list
 
 
 class ospf_auto:
@@ -46,9 +45,9 @@ class ospf_auto:
     def __add_xml(self, xml_content):
         self.xml_list.append(xml_content)
 
-    # def get_vlan_config(self,vlan_id=choice(vlan_list),address,mask):
-    #     vlan_config1 = config().create_vlan(vlan_id)
-    #     vlanif_address = config().interface_addrsss(f'vlanif{vlan_id}',address,mask)
+    def get_vlan_config(self,vlan_id=choice(vlan_list),address,mask):
+        vlan_config1 = config().create_vlan(vlan_id)
+        vlanif_address = config().interface_addrsss(f'vlanif{vlan_id}',address,mask)
 
 
     def ospf_config(self,process,area_id):
