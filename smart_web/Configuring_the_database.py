@@ -5,7 +5,6 @@ RT_head = random.choice(RT_before)
 RT_tail = random.choice(RT_before)
 AS_list = [f'{i}' for i in range(1, 65536)]
 fixed_as = random.choice(AS_list)
-vlan_list = [f'{i}' for i in range(2, 4094)]
 
 class config:
     def __init__(self):

@@ -1,7 +1,8 @@
 import ipaddress
 import xml.etree.ElementTree as ET
 from random import choice
-from Configuring_the_database import config, generic, RT_before,vlan_list
+from Configuring_the_database import config, generic, RT_before
+import setting_config
 
 
 class ospf_auto:
