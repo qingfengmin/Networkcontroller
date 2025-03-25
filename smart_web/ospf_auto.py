@@ -60,5 +60,3 @@ class ospf_auto:
         self.__add_xml(loopback_config)
         ospf_View = config().ospf_Process(process,loopback_ip,area_id)
         self.__add_xml(ospf_View)
-
-if __name__ == '__main__':
