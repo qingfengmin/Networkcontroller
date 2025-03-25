@@ -2,7 +2,7 @@ import ipaddress
 import xml.etree.ElementTree as ET
 from random import choice
 from Configuring_the_database import config, generic, RT_before
-import setting_config
+from setting_config import config_data as setting
 
 
 class ospf_auto:
@@ -13,6 +13,8 @@ class ospf_auto:
         self.up_LoopBack_list = []
         self.ns = {'ifm':'http://www.huawei.com/netconf/vrp'}
         self.ip_list = {}
+        self.vlan = list(setting().vlan())
+        self.loopback = list(setting().loopback())
 
     def __get_interface_num(self,xml_data):
         # 去除字符串开头和结尾的空白字符
@@ -46,7 +48,8 @@ class ospf_auto:
     def __add_xml(self, xml_content):
         self.xml_list.append(xml_content)
 
-    def get_vlan_config(self,vlan_id=choice(vlan_list),address,mask):
+    def get_vlan_config(self):
+
         vlan_config1 = config().create_vlan(vlan_id)
         vlanif_address = config().interface_addrsss(f'vlanif{vlan_id}',address,mask)
 

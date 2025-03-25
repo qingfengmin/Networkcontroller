@@ -12,7 +12,7 @@ class config_data:
         self.default_network = '172.16.1.0'
         self.default_mask = '255.255.255.0'
 
-    def ip_address(self, network, mask):
+    def __ip_address(self, network, mask):
         # 不提供默认值，强制用户指定
         try:
             network_str = f"{network}/{mask}"
@@ -43,4 +43,6 @@ class config_data:
         return self.__get_range('vni', start_vni, end_vni)
 
     def loopback(self):
-        return self.ip_address(self.default_network, self.default_mask)
+        return self.__ip_address(self.default_network, self.default_mask)
+
+    def network_segment(self,address,mask):
