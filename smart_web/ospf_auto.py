@@ -14,7 +14,8 @@ class ospf_auto:
         self.ns = {'ifm':'http://www.huawei.com/netconf/vrp'}
         self.ip_list = {}
         self.vlan = list(setting().vlan())
-        self.loopback = list(setting().loopback())
+        self.loopback = dict(setting().loopback())
+        print(self.vlan, self.loopback)
 
     def __get_interface_num(self,xml_data):
         # 去除字符串开头和结尾的空白字符
@@ -48,18 +49,23 @@ class ospf_auto:
     def __add_xml(self, xml_content):
         self.xml_list.append(xml_content)
 
-    def get_vlan_config(self):
-
-        vlan_config1 = config().create_vlan(vlan_id)
-        vlanif_address = config().interface_addrsss(f'vlanif{vlan_id}',address,mask)
-
+    def __get_vlan_config(self,address,mask):
+        try:
+            vlan_id = choice(self.vlan)
+            vlan_config1 = config().create_vlan(vlan_id)
+            vlanif_address = config().interface_addrsss(f'vlanif{vlan_id}',address,mask)
+            return [vlan_config1, vlanif_address]
+        except ValueError as e:
+            print(f"输入的网络地址或子网掩码无效: {e}")
+            return []
 
     def ospf_config(self,process,area_id):
         self.__add_xml(generic['lldp_enable'])
-        loopback_ip = choice(list(self.ip_list.keys()))
-        print(loopback_ip)
+        loopback_ip = choice(self.loopback)
         loopback_id = f'LoopBack{choice(RT_before)}'
-        loopback_config = config().interface_addrsss(loopback_ip,loopback_id,'255.255.255.255')
+        loopback_config = config().interface_addrsss(loopback_ip,loopback_id,)
         self.__add_xml(loopback_config)
         ospf_View = config().ospf_Process(process,loopback_ip,area_id)
         self.__add_xml(ospf_View)
+if __name__ == '__main__':
+    ospf_auto()

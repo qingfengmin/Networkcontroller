@@ -30,7 +30,6 @@ class config_data:
             result_range = default_range
         else:
             result_range = list(range(start, end + 1))
-        print(f"使用的 {range_type} 范围是: {result_range}")
         return result_range
 
     def vlan(self, start_vlan=None, end_vlan=None):
@@ -45,4 +44,3 @@ class config_data:
     def loopback(self):
         return self.__ip_address(self.default_network, self.default_mask)
 
-    def network_segment(self,address,mask):
