@@ -4,68 +4,49 @@ from random import choice
 from Configuring_the_database import config, generic, RT_before
 from setting_config import config_data as setting
 
-
 class ospf_auto:
     def __init__(self):
-        # 初始化一个空列表来存储 XML 内容
         self.xml_list = []
         self.up_GE_list = []
         self.up_LoopBack_list = []
         self.ns = {'ifm':'http://www.huawei.com/netconf/vrp'}
         self.ip_list = {}
         self.vlan = list(setting().vlan())
-        self.loopback = dict(setting().loopback())
-        print(self.vlan, self.loopback)
+        self.loopback_network = list(setting().loopback().keys())
+        self.loopback_mask = list(setting().loopback().values())
 
-    def __get_interface_num(self,xml_data):
-        # 去除字符串开头和结尾的空白字符
-        root = ET.fromstring(xml_data)
-
-        for interface in root.findall('.//ifm:interface', self.ns):
-            if_name = interface.find('ifm:ifName', self.ns).text
-            if_status = interface.find('.//ifm:ifOperStatus', self.ns).text
-
+    def __get_interface_num(self, xml_data):
+        for interface in ET.fromstring(xml_data).findall('.//ifm:interface', self.ns):
+            if_name, if_status = interface.find('ifm:ifName', self.ns).text, interface.find('.//ifm:ifOperStatus', self.ns).text
             if if_status == 'up':
-                if if_name.startswith('GE'):
-                    self.up_GE_list.append(if_name)
-                elif if_name.startswith('LoopBack'):
-                    self.up_LoopBack_list.append(if_name)
+                (self.up_GE_list if if_name.startswith('GE') else self.up_LoopBack_list).append(if_name)
         return self.up_GE_list, self.up_LoopBack_list
-
-    def ip_address(self,network='172.16.1.0',mask='255.255.255.0'):
-        try:
-            # 组合网络地址和子网掩码
-            network_str = f"{network}/{mask}"
-            # 创建 IPv4 网络对象
-            ip_network = ipaddress.IPv4Network(network_str, strict=False)
-            # 生成网段下的所有 IP 地址
-            ip_list = {str(ip):str(ip_network.netmask) for ip in ip_network.hosts()}
-            print(ip_list)
-            return ip_list
-        except ValueError as e:
-            print(f"输入的网络地址或子网掩码无效: {e}")
-            return []
 
     def __add_xml(self, xml_content):
         self.xml_list.append(xml_content)
 
-    def __get_vlan_config(self,address,mask):
+    def __get_vlan_config(self, address, mask):
         try:
             vlan_id = choice(self.vlan)
-            vlan_config1 = config().create_vlan(vlan_id)
-            vlanif_address = config().interface_addrsss(f'vlanif{vlan_id}',address,mask)
-            return [vlan_config1, vlanif_address]
+            return [config().create_vlan(vlan_id), config().interface_addrsss(f'vlanif{vlan_id}', address, mask)]
         except ValueError as e:
             print(f"输入的网络地址或子网掩码无效: {e}")
             return []
 
-    def ospf_config(self,process,area_id):
+    def ospf_config(self, process, area_id):
         self.__add_xml(generic['lldp_enable'])
-        loopback_ip = choice(self.loopback)
-        loopback_id = f'LoopBack{choice(RT_before)}'
-        loopback_config = config().interface_addrsss(loopback_ip,loopback_id,)
-        self.__add_xml(loopback_config)
-        ospf_View = config().ospf_Process(process,loopback_ip,area_id)
-        self.__add_xml(ospf_View)
+        loopback_ip = choice(self.loopback_network)
+        self.__add_xml(config().interface_addrsss(loopback_ip, f'LoopBack{choice(RT_before)}', choice(self.loopback_mask)))
+        self.__add_xml(str((config().ospf_Process(process, loopback_ip, area_id))))
+        all_config_copy = self.xml_list.copy()
+        self.xml_list.clear()
+        return all_config_copy
+
+    def ospf_area(self,process,):
+    
 if __name__ == '__main__':
-    ospf_auto()
+    # ospf_auto()
+    meirui = ospf_auto().ospf_config('1','0.0.0.1')
+    for i in meirui:
+        print(i)
+        # print(meirui)
