@@ -1,6 +1,5 @@
 import ipaddress
 
-
 class config_data:
     def __init__(self):
         self.__default_ranges = {
@@ -11,6 +10,7 @@ class config_data:
         # 这里保留的默认值作为 Loopback 端口网段
         self.default_network = '172.16.1.0'
         self.default_mask = '255.255.255.0'
+        self.devices = {}
 
     def __ip_address(self, network, mask):
         # 不提供默认值，强制用户指定
@@ -43,4 +43,15 @@ class config_data:
 
     def loopback(self):
         return self.__ip_address(self.default_network, self.default_mask)
+
+    def create_device(self,host,devcice_type):
+        try:
+
+            self.devices = {host: devcice_type}
+            return self.devices
+        except ValueError as e:
+            print(f"输入的网络地址或子网掩码无效: {e}")
+            return []
+    def device(self):
+        return self.devices
 
