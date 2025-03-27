@@ -29,7 +29,7 @@ class config_data:
         if start is None or end is None:
             result_range = default_range
         else:
-            result_range = list(range(start, end + 1))
+            result_range = list(range(int(start), int(end) + 1))
         return result_range
 
     def vlan(self, start_vlan=None, end_vlan=None):

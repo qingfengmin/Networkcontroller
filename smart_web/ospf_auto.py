@@ -42,7 +42,7 @@ class ospf_auto:
         self.xml_list.clear()
         return all_config_copy
 
-    def ospf_area(self,process,):
+    # def ospf_area(self,process,):
     
 if __name__ == '__main__':
     # ospf_auto()
