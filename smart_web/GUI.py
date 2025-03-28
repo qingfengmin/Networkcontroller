@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from setting_config import config_data as setting
 import netconf_session as ncs
 from tkinter import ttk
@@ -7,10 +8,12 @@ button_list = ['设置BD域', '设置vni', '设置环回口地址范围', '添�
 action_buttons = []
 
 class netconfapp_gui:
-    def __init__(self,root): #将初始化的参数放在这里
+    def __init__(self, root):
         self.root = root
         self.root.title('初代python控制器')
         self.root.geometry('800x600')
+        # 确保在 __init__ 方法中正确初始化 setting 属性
+        self.setting = setting()
         self.design()
         self.Centralized_gateway()
         self.show_buttons()
@@ -24,8 +27,6 @@ class netconfapp_gui:
         config_window.title("配置资源")
         config_window.geometry("300x300")
         tk.Label(config_window, text="这里是配置资源的窗口").pack()
-        #定义配置资源的窗口
-
         # 定义用于存储输入值的变量
         bd_start_var = tk.StringVar()
         bd_end_var = tk.StringVar()
@@ -38,13 +39,14 @@ class netconfapp_gui:
             (bd_start_var, bd_end_var),
             (vni_start_var, vni_end_var),
             (vlan_start_var, vlan_end_var)
-        ]#设置输入框的变量
+        ]  # 设置输入框的变量
+
 
         for (start_var, end_var), (label_text, frame) in zip(input_vars, [
             ('输入BD域的起始值,如不输入将采用默认值1_100', tk.Frame(config_window)),
             ('输入VNI的起始值,如不输入将采用默认值1_100', tk.Frame(config_window)),
             ('输入vlan的起始值,如不输入将采用默认值1_100', tk.Frame(config_window)),
-        ]):#设置输入框的标签
+        ]):  # 设置输入框的标签
             frame.pack(side=tk.TOP, pady=20)
             tk.Label(frame, text=label_text).pack()
             # 将输入框与对应的变量关联
@@ -63,9 +65,11 @@ class netconfapp_gui:
             vlan_start = vlan_start_var.get()
             vlan_end = vlan_end_var.get()
 
-            setting().BD(bd_start,bd_end)
-            setting().vni(vni_start,vni_end)
-            setting().vlan(vlan_start,vlan_end)
+            setting().BD(bd_start, bd_end)
+            setting().vni(vni_start, vni_end)
+            setting().vlan(vlan_start, vlan_end)
+            # 关闭窗口
+            config_window.destroy()
 
         submit_button = tk.Button(config_window, text="提交", command=get_input_values)
         submit_button.pack()
@@ -91,7 +95,7 @@ class netconfapp_gui:
         frame = ttk.Frame(self.root)
         frame.pack(pady=10)
         columns = ('IP地址', '设备类型')
-        self.tree  = ttk.Treeview(frame, columns=columns,show='headings')
+        self.tree = ttk.Treeview(frame, columns=columns, show='headings')
         for col in columns:
             self.tree.heading(col, text=col)
             self.tree.column(col, width=150)
@@ -101,52 +105,53 @@ class netconfapp_gui:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
+        # 添加删除按钮
+        delete_button = ttk.Button(frame, text="删除设备", command=self.delete_device)
+        delete_button.pack(side=tk.BOTTOM, pady=5)
+
     def add_device(self):
         device_windows = tk.Toplevel(self.root)
         device_windows.title("添加网络设备")
         device_windows.geometry("300x300")
 
-        # 创建输入变量
-        ip_address_var = tk.StringVar()
-        device_type_var = tk.StringVar(value="核心网关")
+        # 设备参数输入项
+        ttk.Label(device_windows, text='IP地址:').grid(row=0, column=0)
+        ip_entry = ttk.Entry(device_windows)
+        ip_entry.grid(row=0, column=1)
 
-        # IP地址输入框
-        ip_frame = tk.Frame(device_windows)
-        ip_frame.pack(pady=20)
-        tk.Label(ip_frame, text="设备IP地址:").pack(side=tk.LEFT)
-        tk.Entry(ip_frame, textvariable=ip_address_var).pack(side=tk.LEFT, padx=10)
+        ttk.Label(device_windows, text='设备类型:').grid(row=1, column=0)
+        device_type_combo = ttk.Combobox(device_windows, values=['核心设备', '边界网关', '接入设备'])
+        device_type_combo.current(0)
+        device_type_combo.grid(row=1, column=1)
 
-        # 设备类型下拉菜单
-        type_frame = tk.StringVar(device_windows)
-        type_frame.set("核心网关")
-        type_frame_menu = ttk.Combobox(device_windows, textvariable=type_frame, values=["核心网关", "边缘网关"])
-        type_frame_menu.pack(pady=20)
-        # 提交处理函数
-        def submit_device():
-            ip = ip_address_var.get()
-            dev_type = device_type_var.get()
-            setting().create_device(ip, dev_type)
+        def validate_and_add():
+            if not all([ip_entry.get(), device_type_combo.get()]):
+                messagebox.showerror('错误', '必填字段不能为空')
+                return
 
+            host = ip_entry.get()
+            device_type = device_type_combo.get()
+            # 调用 setting_config 中的 create_device 方法添加设备
+            self.setting.create_device(host, device_type)
 
-            self.tree.insert('', 'end', values=(ip, dev_type))
-            ip_address_var.delete(0, tk.END)
+            self.tree.insert('', 'end', values=(
+                host,
+                device_type
+            ))
             device_windows.destroy()
 
-        submit_btn = tk.Button(device_windows, text="提交", command=submit_device)
-        submit_btn.pack(pady=20)
+        ttk.Button(device_windows, text='添加', command=validate_and_add).grid(row=2, columnspan=2, pady=10)
 
-    def refresh_device_list(self):
-
-        devices = setting().device()
-
-        for ip, dev_type in devices:
-            self.tree.insert('', tk.END, values=(ip, dev_type))
-        # 清空现有数据
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        # 直接使用 setting 实例调用 devices 方法
-
+    def delete_device(self):
+        selected_item = self.tree.selection()
+        if selected_item:
+            item_values = self.tree.item(selected_item, "values")
+            host = item_values[0]
+            # 调用 setting_config 中的 delete_device 方法删除设备
+            self.setting.delete_device(host)
+            self.tree.delete(selected_item)
+        else:
+            messagebox.showwarning("警告", "请先选择要删除的设备。")
 
     def Centralized_gateway(self):
         self.contralized = tk.IntVar()

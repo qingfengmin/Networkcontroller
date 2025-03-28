@@ -23,7 +23,7 @@ class config:
               <am4CfgAddrs>
                 <am4CfgAddr operation="merge">
                   <subnetMask>{mask}</subnetMask>
-                  <addrType>main</addrType>
+                    <addrType>main</addrType>
                   <ifIpAddr>{network}</ifIpAddr>
                 </am4CfgAddr>
               </am4CfgAddrs>
@@ -55,8 +55,8 @@ class config:
           </ospfSites>
         </ospfv2comm>
       </ospfv2>
-    </config>''',
-        return ospf
+    </config>'''
+        return str(ospf)
 
     def ospf_network(self, process, area_id, interface):
         ospf_interface = f'''
@@ -332,15 +332,20 @@ generic = {'int_filter':'''
       </lldp>
     </config>
 ''','lldp_filter':'''
-    <filter type="subtree">
+	<filter type="subtree">
       <lldp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <lldpSys>
-          <lldpSysInformation>
-            <chassisIdSubtype></chassisIdSubtype>
-            <chassisId></chassisId>
-            <sysName></sysName>
-          </lldpSysInformation>
-        </lldpSys>
+        <lldpInterfaces>
+          <lldpInterface>
+            <lldpIfInformation>
+              <portId></portId>
+            </lldpIfInformation>
+			<lldpNeighbors>
+              <lldpNeighbor>
+				<systemName></systemName>
+              </lldpNeighbor>
+            </lldpNeighbors>
+          </lldpInterface>
+        </lldpInterfaces>
       </lldp>
     </filter>
 '''}

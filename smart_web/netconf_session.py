@@ -1,5 +1,7 @@
 from ncclient import manager
 from ncclient.xml_ import to_ele
+from Configuring_the_database import generic as gen
+import xml.etree.ElementTree as ET
 
 
 class netconf_auto:
@@ -50,3 +52,33 @@ class netconf_auto:
         key = self.__get_netconf()
         output = key.edit_config(target='running', config=keys)
         return output
+
+    def get_interfaces(self):
+        filt = gen['lldp_filter']
+        output =  self.display_config_get_filter(filt)
+        root = ET.fromstring(output)
+        res = self.__parsing_xml(root)
+        return dict(res)
+
+    def __parsing_xml(self, xml_data):
+
+        ns = {'nc': 'urn:ietf:params:xml:ns:netconf:base:1.0', 'huawei': 'http://www.huawei.com/netconf/vrp'}
+
+        # 初始化结果字典
+        ge_ce_mapping = {}
+
+        # 遍历所有 lldpInterface 元素
+        for interface in xml_data.findall('.//huawei:lldpInterface', ns):
+            if_name = interface.find('huawei:ifName', ns).text
+            # 检查是否为 GE 接口
+            if if_name.startswith('GE'):
+                neighbors = interface.findall('huawei:lldpNeighbors/huawei:lldpNeighbor', ns)
+                for neighbor in neighbors:
+                    system_name = neighbor.find('huawei:systemName', ns).text
+                    # 检查是否为 CE 设备
+                    if system_name.startswith('CE'):
+                        ge_ce_mapping[if_name] = system_name
+                        # 只取第一个匹配的 CE 设备，跳出内层循环
+                        break
+        return ge_ce_mapping
+

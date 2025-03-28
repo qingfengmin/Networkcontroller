@@ -2,25 +2,18 @@ from ncclient import manager
 
 # 修改为字符串
 Template = '''
-    <filter type="subtree">
-      <ifm xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <interfaces>
-          <interface>
-            <ifName></ifName>
-            <ifDynamicInfo>
-              <ifOperStatus></ifOperStatus>
-            </ifDynamicInfo>
-          </interface>
-        </interfaces>
-      </ifm>
-    </filter>
-''','''
-    <filter type="subtree">
+	<filter type="subtree">
       <lldp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <lldpInterfaces>
           <lldpInterface>
-            <ifName></ifName>
-            <lldpAdminStatus></lldpAdminStatus>
+            <lldpIfInformation>
+              <portId></portId>
+            </lldpIfInformation>
+			<lldpNeighbors>
+              <lldpNeighbor>
+				<systemName></systemName>
+              </lldpNeighbor>
+            </lldpNeighbors>
           </lldpInterface>
         </lldpInterfaces>
       </lldp>
@@ -30,7 +23,7 @@ template1 = '''
     <config>
       <nvo3 xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <nvo3Nves>
-          <nvo3Nve>
+          <nvo3Nve>+
             <ifName>Nve1</ifName>
             <vniMembers>
               <vniMember operation="merge">
@@ -160,15 +153,17 @@ rpc1 = '''
 '''
 
 
-with manager.connect(host='192.168.100.100', port=830, username='python',
-                         password='Huawei@123', hostkey_verify=False, look_for_keys=False, allow_agent=False, device_params={'name': 'huawei'}) as m:
+with manager.connect(host='172.16.1.1', port=830, username='python',
+                         password='Huawei@123',
+                     hostkey_verify=False, look_for_keys=False,
+                     allow_agent=False, device_params={'name': 'huawei'}) as m:
 
-    for i in template1:
-        response = m.edit_config(target='running',config=i)
+    for i in range(0,1):
+        # response = m.edit_config(target='running',config=i)
         # response = m.get_config(source='running',filter=i)
         # response = m.get_config(source='running')
         # response = m.rpc(to_ele(rpc1))
-        # response = m.get(filter=i)
+        response = m.get(filter=Template)
         print(response)
     # 打印 GE 和 LoopBack 接口号
     #     response_xml = response.strip()
