@@ -11,6 +11,10 @@ class config_data:
         self.default_network = '172.16.1.0'
         self.default_mask = '255.255.255.0'
         self.devices = {}
+        self.internet_segment = '10.1.100.0/24'
+        self.prefix_length = 30
+        self.connect_network = []
+
 
     def __ip_address(self, network, mask):
         # 不提供默认值，强制用户指定
@@ -56,9 +60,28 @@ class config_data:
         if host in self.devices:
             del self.devices[host]
         return self.devices
+
     def device(self):
         return self.devices
 
+    def subnetwork_partition(self,network=None,mask=None):
+        if network is None or mask is None:
+            network_str = f"{self.internet_segment}"
+        else:
+            network_str = f"{network}"
+        try:
+            ip_network = ipaddress.IPv4Network(network_str, strict=False)
+            subnets = list(ip_network.subnets(new_prefix=self.prefix_length))
+            self.connect_network = subnets
+            return self.connect_network
+        except ValueError as e:
+            print(f"输入的网络地址或子网掩码无效: {e}")
+            return []
+
+
+if __name__ == '__main__':
+    meirui = config_data().subnetwork_partition()
+    print(meirui)
 
 
 

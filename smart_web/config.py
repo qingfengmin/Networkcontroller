@@ -4,6 +4,11 @@ from ncclient import manager
 Template = '''
 	<filter type="subtree">
       <lldp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+        <lldpSys>
+          <lldpSysInformation>
+            <sysName></sysName>
+          </lldpSysInformation>
+        </lldpSys>
         <lldpInterfaces>
           <lldpInterface>
             <lldpIfInformation>

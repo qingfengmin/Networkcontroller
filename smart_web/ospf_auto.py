@@ -35,6 +35,13 @@ class ospf_auto:
             print(f"输入的网络地址或子网掩码无效: {e}")
             return []
 
+    def must_config(self):
+        list = []
+        list.append(generic['lldp_enable'])
+        loopback_ip = choice(self.loopback_network)
+        list.append(config().interface_addrsss(f'loopback0',loopback_ip, '255.255.255.255'))
+        return list
+
     def ospf_config(self, process, area_id):
         self.__add_xml(generic['lldp_enable'])
         loopback_ip = choice(self.loopback_network)
@@ -44,12 +51,18 @@ class ospf_auto:
         self.xml_list.clear()
         return list(all_config_copy)
 
+    def ospf_interface(self,process,area_id):
+        netconf_auto('').get_interfaces()
+
+
+    def device_list(self,):
+
     # def ospf_area(self,process,):
 
     
 if __name__ == '__main__':
     # ospf_auto()
-    meirui = ospf_auto().ospf_config('2','0.0.0.1')
+    meirui = ospf_auto().must_config()
     for i in meirui:
         kunhua  = netconf_auto('192.168.100.100').dly_key(i)
         print(kunhua)

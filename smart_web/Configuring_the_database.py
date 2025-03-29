@@ -196,7 +196,7 @@ class config:
         return nve
 
     #
-    def bgp(self, router_id):
+    def bgp(self,fixed_as,router_id):
         bgp_template = f'''
     <config>
       <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
@@ -216,6 +216,7 @@ class config:
       </bgp>
     </config>
         '''
+        return bgp_template
 
     def bgp_neighbor(self, address, interface):
         bgp_neighbor = f'''
@@ -334,6 +335,11 @@ generic = {'int_filter':'''
 ''','lldp_filter':'''
 	<filter type="subtree">
       <lldp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+        <lldpSys>
+          <lldpSysInformation>
+            <sysName></sysName>
+          </lldpSysInformation>
+        </lldpSys>
         <lldpInterfaces>
           <lldpInterface>
             <lldpIfInformation>
@@ -349,3 +355,4 @@ generic = {'int_filter':'''
       </lldp>
     </filter>
 '''}
+
