@@ -22,7 +22,7 @@ class config_data:
             network_str = f"{network}/{mask}"
             ip_network = ipaddress.IPv4Network(network_str, strict=False)
             ip_list = {str(ip): str(ip_network.netmask) for ip in ip_network.hosts()}
-            print(ip_list)
+            # print(ip_list)
             return ip_list
         except ValueError as e:
             print(f"输入的网络地址或子网掩码无效: {e}")

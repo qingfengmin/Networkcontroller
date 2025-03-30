@@ -3,6 +3,7 @@ from tkinter import messagebox
 from setting_config import config_data as setting
 import netconf_session as ncs
 from tkinter import ttk
+from sharing_data import database as db
 
 button_list = ['设置BD域', '设置vni', '设置环回口地址范围', '添加网络设备']
 action_buttons = []
@@ -25,7 +26,7 @@ class netconfapp_gui:
     def open_config_window(self):
         config_window = tk.Toplevel(self.root)
         config_window.title("配置资源")
-        config_window.geometry("300x300")
+        config_window.geometry("300x400")
         tk.Label(config_window, text="这里是配置资源的窗口").pack()
         # 定义用于存储输入值的变量
         bd_start_var = tk.StringVar()
@@ -34,11 +35,17 @@ class netconfapp_gui:
         vni_end_var = tk.StringVar()
         vlan_start_var = tk.StringVar()
         vlan_end_var = tk.StringVar()
+        ipaddress = tk.StringVar()
+        mask = tk.StringVar()
+
+        ipaddress.set("10.1.100.0/24")
+        mask.set("30")
 
         input_vars = [
             (bd_start_var, bd_end_var),
             (vni_start_var, vni_end_var),
-            (vlan_start_var, vlan_end_var)
+            (vlan_start_var, vlan_end_var),
+            (ipaddress, mask)
         ]  # 设置输入框的变量
 
 
@@ -46,6 +53,7 @@ class netconfapp_gui:
             ('输入BD域的起始值,如不输入将采用默认值1_100', tk.Frame(config_window)),
             ('输入VNI的起始值,如不输入将采用默认值1_100', tk.Frame(config_window)),
             ('输入vlan的起始值,如不输入将采用默认值1_100', tk.Frame(config_window)),
+            ('输入互联地址网段,如不输入将采用默认10.1.100.0/24 30', tk.Frame(config_window)),
         ]):  # 设置输入框的标签
             frame.pack(side=tk.TOP, pady=20)
             tk.Label(frame, text=label_text).pack()
@@ -64,10 +72,13 @@ class netconfapp_gui:
             vni_end = vni_end_var.get()
             vlan_start = vlan_start_var.get()
             vlan_end = vlan_end_var.get()
+            ipaddress_net = ipaddress.get()
+            mask_net = mask.get()
 
             setting().BD(bd_start, bd_end)
             setting().vni(vni_start, vni_end)
             setting().vlan(vlan_start, vlan_end)
+            setting().subnetwork_partition(ipaddress_net, mask_net)
             # 关闭窗口
             config_window.destroy()
 
@@ -86,6 +97,12 @@ class netconfapp_gui:
 
         add_device_button = tk.Button(self.root, text="添加网络设备", command=self.add_device)
         add_device_button.pack()
+
+        infor2 = tk.Label(self.root, text='点击初始化按钮,将会自动获取网络设备的信息', bg='green', fg='white')
+        infor2.pack()
+
+        init_button = tk.Button(self.root, text="初始化", command=db().init())
+        init_button.pack()
 
         for i in button_list:
             button2 = tk.Button(self.root, text=i, bg='green', fg='white')

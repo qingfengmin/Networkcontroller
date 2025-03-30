@@ -4,70 +4,79 @@ import random
 
 class database:
     def __init__(self):
-        self.Devices= dict({})
-        self.interface_infor = {}
-    def Device(self,host,loopback,interfaces,process,vlans):
-        device = {host:{'ip':loopback,
-                        'ospf_process':process,
-                        'connect_data':{vlans:interfaces}
-                        }}
-        self.Devices.update(device)
+        self.Devices = {}
+        self.__interface_infor = {}
+        self.__hostlist = []
+        self.__loopback_network = list(settings().loopback().keys())
 
-    def get_interfaces_vlans(self,host):
-        interfaces = self.Devices[host]['connect_data']
-        return interfaces
+    def addDevice(self, device):
+        self.__hostlist.append(device)
 
-    # def auto_device_info(self):
+    def init(self):
+        for host in self.__hostlist:
+            info = self.__neighbor(host)
+            loopback_ip = random.choice(self.__loopback_network)
+            self.Devices[host] = {
+                'devices_name': info[host]['devices_name'],
+                'loopback_ip': loopback_ip
+            }
+        self.Devices = self.__generate_vlan_config(self.__interface_infor)
 
-    def neighbor(self,host):
+    def __neighbor(self, host):
         device = nc(host).get_interfaces()
-        self.interface_infor.update(device)
-        print(self.interface_infor)
+        self.__interface_infor.update(device)
         return device
 
-    # def
-
-    def __generate_vlan_config(self,lldp_info):
-        # 初始化配置数据
-        # 获取 VLAN 范围
+    def __generate_vlan_config(self, lldp_info):
         vlan_range = settings().vlan()
-
-        # 存储每个设备接口的 VLAN 配置
-        vlan_config = {}
-        # 存储已经分配的 VLAN 信息
+        subnets = settings().subnetwork_partition()
         assigned_vlans = {}
+        vlan_ip_networks = {}
+        assigned_ips = set()
+        vlan_config = {}
 
-        # 遍历每个设备
-        for device, interfaces in lldp_info.items():
-            vlan_config[device] = {}
-            # 遍历设备的每个接口
-            for interface, neighbor in interfaces.items():
-                # 构建唯一的连接标识
-                link = tuple(sorted([(device, interface), (
-                neighbor, [key for key, val in lldp_info[neighbor].items() if val == device][0])]))
+        for host_ip, info in lldp_info.items():
+            interfaces = info['interface']
+            vlan_config[host_ip] = {
+                'devices_name': info['devices_name'],
+                'loopback_ip': self.Devices.get(host_ip, {}).get('loopback_ip', ''),
+                'interface': {},
+                'vlanif': {}
+            }
 
-                # 检查该连接是否已经分配了 VLAN
-                if link in assigned_vlans:
-                    # 如果已经分配，则使用相同的 VLAN
-                    vlan = assigned_vlans[link]
-                else:
-                    # 如果未分配，则随机选择一个 VLAN
-                    vlan = random.choice(vlan_range)
-                    # 记录该连接的 VLAN 分配
-                    assigned_vlans[link] = vlan
+            for interface, neighbor_device in interfaces.items():
+                neighbor_host = next((ip for ip, data in lldp_info.items() if data['devices_name'] == neighbor_device), None)
+                link = tuple(sorted([(host_ip, interface), (neighbor_host, next(iface for iface, dev in lldp_info[neighbor_host]['interface'].items() if dev == info['devices_name']))]))
 
-                # 记录当前设备接口的 VLAN 分配
-                vlan_config[device][interface] = vlan
+                vlan = assigned_vlans.get(link) or random.choice(vlan_range)
+                assigned_vlans[link] = vlan
+                vlan_config[host_ip]['interface'][interface] = vlan
+
+                if vlan not in vlan_ip_networks:
+                    if subnets:
+                        vlan_ip_networks[vlan] = subnets.pop(0)
+                    else:
+                        print("没有可用的子网。")
+                        continue
+
+                ip_network = vlan_ip_networks.get(vlan)
+                ip_generator = ip_network.hosts()
+                ip = next((ip for ip in ip_generator if str(ip) not in assigned_ips), None)
+
+                if not ip:
+                    print(f"VLAN {vlan} 网段中没有可用的 IP 地址了。")
+                    continue
+
+                assigned_ips.add(str(ip))
+                vlan_config[host_ip]['vlanif'][vlan] = str(ip)
 
         return vlan_config
 
 
-
-
 if __name__ == '__main__':
     db = database()
-    # db.Device('172.16.1.1','172.16.1.2','G0/0/1','1',12)
-    list = ['172.16.1.1','172.16.1.2','172.16.1.3']
-    for i in list:
-        db.neighbor(i)
-    # print(db.Devices)
+    list1 = ['192.168.100.101', '192.168.100.102', '192.168.100.103']
+    for i in list1:
+        db.addDevice(i)
+    db.init()
+    print(db.Devices)

@@ -55,16 +55,24 @@ class netconf_auto:
 
     def get_interfaces(self):
         filt = gen['lldp_filter']
-        output =  self.display_config_get_filter(filt)
+        output = self.display_config_get_filter(filt)
         root = ET.fromstring(output)
-        res = self.__parsing_xml(root)
-        return dict(res)
+        # 获取设备名称和接口映射
+        device_name, interface_mapping = self.__parsing_xml(root)
+        # 构建返回的字典
+        result = {
+            self.host: {
+                'devices_name': device_name,
+                'interface': interface_mapping
+            }
+        }
+        return result
 
     def __parsing_xml(self, xml_data):
         ns = {'nc': 'urn:ietf:params:xml:ns:netconf:base:1.0', 'huawei': 'http://www.huawei.com/netconf/vrp'}
         sys_name = xml_data.find('.//huawei:lldp/huawei:lldpSys/huawei:lldpSysInformation/huawei:sysName', ns).text
-        # 初始化结果字典
-        ge_ce_mapping = {sys_name: {}}
+        # 初始化接口映射字典
+        interface_mapping = {}
 
         # 遍历所有 lldpInterface 元素
         for interface in xml_data.findall('.//huawei:lldpInterface', ns):
@@ -76,12 +84,13 @@ class netconf_auto:
                     system_name = neighbor.find('huawei:systemName', ns).text
                     # 检查是否为 CE 设备
                     if system_name.startswith('CE'):
-                        # 将 GE 接口与 CE 设备的映射关系添加到 sys_name 对应的字典中
-                        ge_ce_mapping[sys_name][if_name] = system_name
+                        # 将 GE 接口与 CE 设备的映射关系添加到接口映射字典中
+                        interface_mapping[if_name] = system_name
                         # 只取第一个匹配的 CE 设备，跳出内层循环
                         break
-        return ge_ce_mapping
+
+        return sys_name, interface_mapping
 
 if __name__ == '__main__':
-    meirui = netconf_auto('172.16.1.1').get_interfaces()
+    meirui = netconf_auto('192.168.100.101').get_interfaces()
     print(meirui)
