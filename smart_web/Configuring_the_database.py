@@ -56,7 +56,7 @@ class config:
         </ospfv2comm>
       </ospfv2>
     </config>'''
-        return str(ospf)
+        return ospf
 
     def ospf_network(self, process, area_id, interface):
         ospf_interface = f'''
