@@ -35,12 +35,7 @@ class ospf_auto:
             print(f"输入的网络地址或子网掩码无效: {e}")
             return []
 
-    def must_config(self):
-        list = []
-        list.append(generic['lldp_enable'])
-        loopback_ip = choice(self.loopback_network)
-        list.append(config().interface_addrsss(f'loopback0',loopback_ip, '255.255.255.255'))
-        return list
+
 
     def ospf_config(self, process, area_id):
         self.__add_xml(generic['lldp_enable'])

@@ -10,6 +10,7 @@ action_buttons = []
 
 class netconfapp_gui:
     def __init__(self, root):
+        self.db = db()  # 创建持久化实例
         self.root = root
         self.root.title('初代python控制器')
         self.root.geometry('800x600')
@@ -103,8 +104,19 @@ class netconfapp_gui:
         infor2 = tk.Label(self.root, text='点击初始化按钮,将会自动获取网络设备的信息', bg='green', fg='white')
         infor2.pack()
 
-        init_button = tk.Button(self.root, text="初始化", command=db().init())
+        init_button = tk.Button(self.root, text="初始化", command=lambda :self.db.init())
         init_button.pack()
+
+        infor3 = tk.Label(self.root, text='点击查看配置,可以看见设备配置的基础信息', bg='green', fg='white')
+        infor3.pack()
+
+        # 修改查看配置按钮的绑定
+        get_config_button = tk.Button(
+            self.root, 
+            text="查看配置",
+            command=lambda: self.log_message(self.db.get_device())  # 输出到GUI控制台
+        )
+        get_config_button.pack()
 
         for i in button_list:
             button2 = tk.Button(self.root, text=i, bg='green', fg='white')
@@ -150,6 +162,7 @@ class netconfapp_gui:
 
             host = ip_entry.get()
             device_type = device_type_combo.get()
+            print(host, device_type)
             # 调用 setting_config 中的 create_device 方法添加设备
             self.db.create_device(host, device_type)
 
