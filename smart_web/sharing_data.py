@@ -11,6 +11,8 @@ class database:
         self.__hostlist = {}
         self.con = config()
         self.__loopback_network = list(settings().loopback().keys())
+        # self.mask = settings().subnetwork_partition().hosts
+        #
 
     def create_device(self, host, device_type):
         try:
@@ -87,19 +89,26 @@ class database:
                 out = nc(i).dly_key(j)
                 print(out)
             list.clear()
-    #
+
     def connect_ipaddress(self):
         devicelist = self.Devices.keys()
-        list =[]
+        list1 =[]
         for i in devicelist:
-            coonfig = self.Devices[i]
-            for ints,vs in coonfig['interface'].items():
-                vlans = self.__vlan_format(vs)
-                list.append(self.con.create_vlan(vs))
-                list.append(self.con.GE_interface(ints,vlans))
-
-        
-
+            config = self.Devices[i]
+            # print(config)
+            for ints,vs in config['interface'].items():
+                vlanlist = [vs]
+                vlans = self.__vlan_format(vlanlist)
+                list1.append(self.con.create_vlan(vs))
+                list1.append(self.con.GE_interface(ints,vlans))
+                list1.append(self.con.interface_addrsss(f'vlanif{vs}',config['vlanif'][vs],'255.255.255.252'))
+            out = nc(i)
+            for j in list1:
+                # print(list1)
+                res = out.dly_key(j)
+                print(res)
+                # print(j)
+            list1.clear()
 
     def __neighbor(self, host):
         device = nc(host).get_interfaces()
@@ -190,4 +199,3 @@ class database:
                 vlan_config[host_ip]['vlanif'][vlan] = str(ip)
 
         return vlan_config
-

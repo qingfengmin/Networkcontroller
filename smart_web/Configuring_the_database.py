@@ -263,7 +263,7 @@ class config:
         </bgpcomm>
       </bgp>
     </config>
-        ''', f'''
+        '''+ f'''
             <config>
       <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <bgpcomm>
@@ -309,30 +309,22 @@ class config:
 
     def GE_interface(self,inteface,vlanlist):
         GE = f'''
-    <config>
-      <ethernet xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <ethernetIfs>
-          <ethernetIf operation="merge">
-            <ifName>{inteface}</ifName>
-          </ethernetIf>
-        </ethernetIfs>
-      </ethernet>
-    </config>
-        ''',f'''
-    <config>
+        <config>
        <ethernet xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
          <ethernetIfs>
-           <ethernetIf>
+           <ethernetIf operation="merge">
              <ifName>{inteface}</ifName>
+             <l2Enable>enable</l2Enable>
              <l2Attribute operation="merge">
                <linkType>trunk</linkType>
-			   <trunkvlans>{vlanlist}</trunkvlans>
+               <pvid>1</pvid>
+			   <trunkVlans>{vlanlist}</trunkVlans>
              </l2Attribute>
            </ethernetIf>
          </ethernetIfs>
        </ethernet>
      </config>
-        '''
+'''
         return GE
 
 

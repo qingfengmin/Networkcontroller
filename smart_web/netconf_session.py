@@ -49,8 +49,8 @@ class netconf_auto:
         return output
 
     def dly_key(self, keys):
-        key = self.__get_netconf()
-        output = key.edit_config(target='running', config=keys)
+        with  self.__get_netconf() as key:
+            output = key.edit_config(target='running', config=keys)
         return output
 
     def get_interfaces(self):
@@ -90,7 +90,6 @@ class netconf_auto:
                         break
 
         return sys_name, interface_mapping
-
 if __name__ == '__main__':
     meirui = netconf_auto('192.168.100.101').get_interfaces()
     print(meirui)
