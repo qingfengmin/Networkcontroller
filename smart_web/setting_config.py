@@ -10,7 +10,6 @@ class config_data:
         # 这里保留的默认值作为 Loopback 端口网段
         self.default_network = '172.16.1.0'
         self.default_mask = '255.255.255.0'
-        self.devices = {}
         self.internet_segment = '10.1.100.0/24'
         self.prefix_length = 30
         self.connect_network = []
@@ -48,22 +47,6 @@ class config_data:
     def loopback(self):
         return self.__ip_address(self.default_network, self.default_mask)
 
-    def create_device(self, host, device_type):
-        try:
-            self.devices[host] = device_type
-            return self.devices
-        except ValueError as e:
-            print(f"输入的网络地址或子网掩码无效: {e}")
-            return []
-
-    def delete_device(self, host):
-        if host in self.devices:
-            del self.devices[host]
-        return self.devices
-
-    def device(self):
-        return self.devices
-
     def subnetwork_partition(self,network=None,mask=None):
         if network is None or mask is None:
             network_str = f"{self.internet_segment}"
@@ -77,7 +60,6 @@ class config_data:
         except ValueError as e:
             print(f"输入的网络地址或子网掩码无效: {e}")
             return []
-
 
 if __name__ == '__main__':
     meirui = config_data().subnetwork_partition()

@@ -6,11 +6,20 @@ class database:
     def __init__(self):
         self.Devices = {}
         self.__interface_infor = {}
-        self.__hostlist = []
+        self.__hostlist = {}
         self.__loopback_network = list(settings().loopback().keys())
 
-    def addDevice(self, device):
-        self.__hostlist.append(device)
+    def create_device(self, host, device_type):
+        try:
+            self.__hostlist[host] = device_type
+            return self.__hostlist
+        except ValueError as e:
+            print(f"输入的网络地址或子网掩码无效: {e}")
+            return []
+
+    def delete_device(self, host):
+        if host in self.__hostlist:
+            del self.__hostlist[host]
 
     def init(self):
         for host in self.__hostlist:
@@ -26,6 +35,9 @@ class database:
         device = nc(host).get_interfaces()
         self.__interface_infor.update(device)
         return device
+
+    def __vlan_format(self,vlan_list):
+
 
     def __generate_vlan_config(self, lldp_info):
         vlan_range = settings().vlan()

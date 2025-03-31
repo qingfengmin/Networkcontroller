@@ -2,146 +2,40 @@ from ncclient import manager
 
 # 修改为字符串
 Template = '''
-	<filter type="subtree">
-      <lldp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <lldpSys>
-          <lldpSysInformation>
-            <sysName></sysName>
-          </lldpSysInformation>
-        </lldpSys>
-        <lldpInterfaces>
-          <lldpInterface>
-            <lldpIfInformation>
-              <portId></portId>
-            </lldpIfInformation>
-			<lldpNeighbors>
-              <lldpNeighbor>
-				<systemName></systemName>
-              </lldpNeighbor>
-            </lldpNeighbors>
-          </lldpInterface>
-        </lldpInterfaces>
-      </lldp>
+    <filter type="subtree">
+      <ethernet xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+        <ethernetIfs>
+          <ethernetIf>
+            <ifName>GE1/0/4</ifName>
+            <l2Attribute>
+              <linkType></linkType>
+              <pvid></pvid>
+              <trunkVlans></trunkVlans>
+            </l2Attribute>
+          </ethernetIf>
+        </ethernetIfs>
+      </ethernet>
     </filter>
 '''
-template1 = '''
-    <config>
-      <nvo3 xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <nvo3Nves>
-          <nvo3Nve>+
-            <ifName>Nve1</ifName>
-            <vniMembers>
-              <vniMember operation="merge">
-                <vniId>10</vniId>
-                <protocol>bgp</protocol>
-              </vniMember>
-            </vniMembers>
-          </nvo3Nve>
-        </nvo3Nves>
-      </nvo3>
-    </config>
-''','''
-    <config>
-      <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <bgpcomm>
-          <bgpSite operation="merge">
-            <bgpEnable>true</bgpEnable>
-            <asNumber>100</asNumber>
-          </bgpSite>
-          <bgpVrfs>
-            <bgpVrf operation="merge">
-              <vrfName>_public_</vrfName>
-              <vrfRidAutoSel>false</vrfRidAutoSel>
-              <routerId>172.16.1.1</routerId>
-            </bgpVrf>
-          </bgpVrfs>
-        </bgpcomm>
-      </bgp>
-    </config>
-''','''
-    <config>
-      <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <bgpcomm>
-          <bgpVrfs>
-            <bgpVrf>
-              <vrfName>_public_</vrfName>
-              <bgpPeers>
-                <bgpPeer operation="merge">
-                  <peerAddr>172.16.1.2</peerAddr>
-                  <remoteAs>100</remoteAs>
-				    <localIfName>LoopBack0</localIfName>
-                </bgpPeer>
-              </bgpPeers>
-            </bgpVrf>
-          </bgpVrfs>
-        </bgpcomm>
-      </bgp>
-    </config>
-''','''
-    <config>
-      <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <bgpcomm>
-          <bgpVrfs>
-            <bgpVrf>
-              <vrfName>_public_</vrfName>
-              <bgpVrfAFs>
-                <bgpVrfAF operation="merge">
-                  <afType>evpn</afType>
-                <policyVpnTarget>false</policyVpnTarget>
-                  <peerAFs>
-                    <peerAF operation="merge">
-                      <remoteAddress>172.16.1.2</remoteAddress>
-                      <advertiseArp>true</advertiseArp>
-                      <allowAsLoopEnable>false</allowAsLoopEnable>
-                    </peerAF>
-                  </peerAFs>
-                </bgpVrfAF>
-              </bgpVrfAFs>
-            </bgpVrf>
-          </bgpVrfs>
-        </bgpcomm>
-      </bgp>
-    </config>
-''','''
-            <config>
-      <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-        <bgpcomm>
-          <bgpVrfs>
-            <bgpVrf>
-              <vrfName>_public_</vrfName>
-              <bgpVrfAFs>
-                <bgpVrfAF>
-                  <afType>ipv4uni</afType>
-                  <peerAFs>
-                    <peerAF operation="delete">
-                      <remoteAddress>172.16.1.2</remoteAddress>
-                    </peerAF>
-                  </peerAFs>
-                </bgpVrfAF>
-              </bgpVrfAFs>
-            </bgpVrf>
-          </bgpVrfs>
-        </bgpcomm>
-      </bgp>
-    </config>
-''','''
+
+num = '''
+5020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000:5020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+'''
+template1 = f'''
 	     <config>
-       <ifm xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
-         <interfaces>
-           <interface operation="merge">
-             <ifName>vlanif300</ifName>
-			 <ifmAm4>
-              <am4CfgAddrs>
-                <am4CfgAddr operation="merge">
-                  <subnetMask>255.255.255.0</subnetMask>
-                  <addrType>main</addrType>
-                  <ifIpAddr>192.168.3.254</ifIpAddr>
-                </am4CfgAddr>
-              </am4CfgAddrs>
-            </ifmAm4>
-           </interface>
-         </interfaces>
-       </ifm>
+       <ethernet xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+         <ethernetIfs>
+           <ethernetIf>
+             <ifName>GE1/0/4</ifName>
+             <l2Enable>enable</l2Enable>
+             <l2Attribute operation="merge">
+               <linkType>trunk</linkType>
+               <pvid>1</pvid>
+			   <trunkVlans>{num}</trunkVlans>
+			   </l2Attribute>
+           </ethernetIf>
+         </ethernetIfs>
+       </ethernet>
      </config>
 '''
 
@@ -163,12 +57,12 @@ with manager.connect(host='172.16.1.1', port=830, username='python',
                      hostkey_verify=False, look_for_keys=False,
                      allow_agent=False, device_params={'name': 'huawei'}) as m:
 
-    for i in range(0,1):
-        # response = m.edit_config(target='running',config=i)
+    # for i in template1:
+        response = m.edit_config(target='running',config=template1)
         # response = m.get_config(source='running',filter=i)
         # response = m.get_config(source='running')
         # response = m.rpc(to_ele(rpc1))
-        response = m.get(filter=Template)
+        # response = m.get(filter=Template)
         print(response)
     # 打印 GE 和 LoopBack 接口号
     #     response_xml = response.strip()

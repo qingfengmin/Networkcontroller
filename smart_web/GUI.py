@@ -15,10 +15,12 @@ class netconfapp_gui:
         self.root.geometry('800x600')
         # 确保在 __init__ 方法中正确初始化 setting 属性
         self.setting = setting()
+        self.db = db()
         self.design()
         self.Centralized_gateway()
         self.show_buttons()
         self.device_list()
+        self.create_console()  # 新增控制台初始化
         self.root.mainloop()
         self.contralized = None
         self.tree = None
@@ -149,7 +151,7 @@ class netconfapp_gui:
             host = ip_entry.get()
             device_type = device_type_combo.get()
             # 调用 setting_config 中的 create_device 方法添加设备
-            self.setting.create_device(host, device_type)
+            self.db.create_device(host, device_type)
 
             self.tree.insert('', 'end', values=(
                 host,
@@ -165,7 +167,7 @@ class netconfapp_gui:
             item_values = self.tree.item(selected_item, "values")
             host = item_values[0]
             # 调用 setting_config 中的 delete_device 方法删除设备
-            self.setting.delete_device(host)
+            self.db.delete_device(host)
             self.tree.delete(selected_item)
         else:
             messagebox.showwarning("警告", "请先选择要删除的设备。")
@@ -184,6 +186,25 @@ class netconfapp_gui:
             for button in action_buttons:
                 button.pack_forget()
 
-# if __name__ == '__main__':
-#     netconfapp_gui(4).refresh_device_list()
-#     netconfapp_gui(4).refresh_device_list()
+    def create_console(self):
+        """创建日志输出控制台"""
+        console_frame = ttk.Frame(self.root)
+        console_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # 控制台标签
+        ttk.Label(console_frame, text="运行日志:").pack(anchor=tk.W)
+        
+        # 带滚动条的文本框
+        self.console_text = tk.Text(console_frame, wrap=tk.WORD, state='disabled', height=10)
+        scroller = ttk.Scrollbar(console_frame, command=self.console_text.yview)
+        
+        self.console_text.configure(yscrollcommand=scroller.set)
+        self.console_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scroller.pack(side=tk.RIGHT, fill=tk.Y)
+
+    def log_message(self, message):
+        """向控制台添加日志"""
+        self.console_text.configure(state='normal')
+        self.console_text.insert(tk.END, message + "\n")
+        self.console_text.see(tk.END)  # 自动滚动到底部
+        self.console_text.configure(state='disabled')

@@ -307,6 +307,21 @@ class config:
         '''
         return vlan
 
+    def GE_interface(self,inteface,vlanid):
+        GE = f'''
+    <config>
+      <ethernet xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+        <ethernetIfs>
+          <ethernetIf operation="merge">
+            <ifName>{inteface}</ifName>
+          </ethernetIf>
+        </ethernetIfs>
+      </ethernet>
+    </config>
+        ''','''
+        
+        '''
+
 
 
 
