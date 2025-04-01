@@ -115,9 +115,14 @@ class database:
         self.__interface_infor.update(device)
         return device
 
-    def __vlan_format(self,vlan_list):
+    def __vlan_format(self, vlan_list):
+        # 初始化两个长度为 4096 的二进制数组，默认值为 '0'
         allow_binary_array = ['0'] * 4096
         change_binary_array = ['0'] * 4096
+
+        # 默认放行 VLAN 1
+        allow_binary_array[2] = '1'  # VLAN 1 对应第 2 个二进制位
+        change_binary_array[2] = '1'
 
         # 将输入的 VLAN 编号对应的位置设置为 '1'
         for vlan in vlan_list:
@@ -141,7 +146,7 @@ class database:
         def binary_to_hex(binary_string):
             hex_result = ''
             for i in range(0, len(binary_string), 4):
-                chunk = binary_string[i:i + 4]
+                chunk = binary_string[i:i+4]
                 # 确保每个 chunk 都是 4 位，不足 4 位时补零
                 chunk = chunk.ljust(4, '0')
                 hex_digit = hex(int(chunk, 2))[2:].upper()  # 转为十六进制并去掉 '0x' 前缀
@@ -156,6 +161,7 @@ class database:
         return f"{allow_hex_part}:{change_hex_part}"
 
     def __generate_vlan_config(self, lldp_info):
+        # 直接获取最新配置
         vlan_range = settings().vlan()
         subnets = settings().subnetwork_partition()
         assigned_vlans = {}

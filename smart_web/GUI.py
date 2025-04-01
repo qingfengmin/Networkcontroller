@@ -77,12 +77,15 @@ class netconfapp_gui:
             vlan_end = vlan_end_var.get()
             ipaddress_net = ipaddress.get()
             mask_net = mask.get()
-
-            setting().BD(bd_start, bd_end)
-            setting().vni(vni_start, vni_end)
-            setting().vlan(vlan_start, vlan_end)
-            setting().subnetwork_partition(ipaddress_net, mask_net)
-            # 关闭窗口
+        
+            # 更新共享配置
+            setting().update_config(
+                vlan_range=(int(vlan_start), int(vlan_end)),
+                BD_range=(int(bd_start), int(bd_end)),
+                vni_range=(int(vni_start), int(vni_end)),
+                internet_segment=f"{ipaddress_net}/{mask_net}"
+            )
+            
             config_window.destroy()
 
         submit_button = tk.Button(config_window, text="提交", command=get_input_values)
