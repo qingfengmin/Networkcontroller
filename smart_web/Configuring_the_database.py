@@ -143,8 +143,6 @@ class config:
               <evpnRT operation="merge">
                 <vrfRTValue>{export_rt}</vrfRTValue>
                 <vrfRTType>export_extcommunity</vrfRTType>
-				<vrfRTValue>2:2</vrfRTValue>
-                <vrfRTType>import_extcommunity</vrfRTType>
               </evpnRT>
             </evpnRTs>
           </evpnInstance>

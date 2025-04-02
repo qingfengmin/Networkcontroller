@@ -1,7 +1,6 @@
 from setting_config import config_data as settings
 from netconf_session import netconf_auto as nc
-from Configuring_the_database import generic, RT_before,config
-from random import choice
+from Configuring_the_database import generic,config
 import random
 
 class database:
@@ -11,8 +10,28 @@ class database:
         self.hostlist = {}
         self.con = config()
         self.__loopback_network = list(settings().loopback().keys())
-        # self.mask = settings().subnetwork_partition().hosts
-        #
+        self.gui_logger = None  # 新增GUI日志引用
+
+    def set_gui_logger(self, logger_func):
+        """设置GUI日志函数"""
+        self.gui_logger = logger_func
+
+    def must_config(self):
+        devicelist = self.Devices.keys()
+        list = []
+        for i in devicelist:
+            list.append(generic['lldp_enable'])
+            list.append(generic['evpn_overlay'])
+            list.append(generic['nve1'])
+            loopback_ip = self.Devices[i]['loopback_ip']
+            list.append(self.con.interface_addrsss(f'loopback0',loopback_ip, '255.255.255.255'))
+            for j in list:
+                out = nc(i).dly_key(j)
+                if self.gui_logger:
+                    self.gui_logger(str(out))  # 使用GUI日志
+                else:
+                    print(out)  # 保留终端输出
+            list.clear()
 
     def create_device(self, host, device_type):
         try:
@@ -45,7 +64,7 @@ class database:
             print(f"\n设备IP: {host}")
             print(f"设备名称: {config['devices_name']}")
             print(f"环回地址: {config['loopback_ip']}")
-            
+
             # 接口配置信息
             if config['interface']:
                 print("\n接口配置:")
@@ -54,7 +73,7 @@ class database:
                     print(f"  {intf.ljust(8)} => VLAN {str(vlan).ljust(4)} | IP: {ip}")
             else:
                 print("\n该设备暂无接口配置")
-            
+
             print("-"*90)
         print("="*100 + "\n")
 
@@ -65,7 +84,7 @@ class database:
             output.append(f"\n设备IP: {host}")
             output.append(f"设备名称: {config['devices_name']}")
             output.append(f"环回地址: {config['loopback_ip']}")
-            
+
             if config['interface']:
                 output.append("\n接口配置:")
                 for intf, vlan in config['interface'].items():
@@ -73,7 +92,7 @@ class database:
                     output.append(f"  {intf.ljust(8)} => VLAN {str(vlan).ljust(4)} | IP: {ip}")
             else:
                 output.append("\n该设备暂无接口配置")
-            
+
             output.append("-"*90)
         output.append("="*100 + "\n")
         return '\n'.join(output)  # <mcsymbol name="get_device" filename="sharing_data.py" path="e:\项目\pythonproject\smart_web\sharing_data.py" startline="36" type="function"></mcsymbol>

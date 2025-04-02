@@ -4,19 +4,24 @@ from setting_config import config_data as setting
 import netconf_session as ncs
 from tkinter import ttk
 from sharing_data import database as db
-
-button_list = ['设置BD域', '设置vni', '设置环回口地址范围', '添加网络设备']
-action_buttons = []
+from ospf_auto import ospf_auto
+from VXlan_auto import vxlan_auto as vx
 
 class netconfapp_gui:
     def __init__(self, root):
-        self.db = db()  # 创建持久化实例
+        self.db = db()  # 创建database实例 # 设置日志回调
         self.root = root
         self.root.title('初代python控制器')
-        self.root.geometry('800x600')
+        self.root.geometry('800x800')
         # 确保在 __init__ 方法中正确初始化 setting 属性
         self.setting = setting()
         self.db = db()
+        self.button_list = [
+            ('配置OSPF', self.configure_ospf),
+            ('配置BGP_EVPN', self.configure_bgp_evpn),
+            ('配置VXLAN集中式网关', self.configure_vxlan_gateway)
+        ]
+        self.action_buttons = []  # 也移到init内部
         self.design()
         self.Centralized_gateway()
         self.show_buttons()
@@ -79,13 +84,11 @@ class netconfapp_gui:
             mask_net = mask.get()
         
             # 更新共享配置
-            setting().update_config(
-                vlan_range=(int(vlan_start), int(vlan_end)),
-                BD_range=(int(bd_start), int(bd_end)),
-                vni_range=(int(vni_start), int(vni_end)),
-                internet_segment=f"{ipaddress_net}/{mask_net}"
-            )
-            
+            self.setting.BD(bd_start, bd_end)
+            self.setting.vni(vni_start, vni_end)
+            self.setting.vlan(vlan_start, vlan_end)
+            self.setting.subnetwork_partition(ipaddress_net, mask_net)
+
             config_window.destroy()
 
         submit_button = tk.Button(config_window, text="提交", command=get_input_values)
@@ -121,10 +124,29 @@ class netconfapp_gui:
         )
         get_config_button.pack()
 
-        for i in button_list:
-            button2 = tk.Button(self.root, text=i, bg='green', fg='white')
-            action_buttons.append(button2)
+        infor4 = tk.Label(self.root, text='点击初始配置,可以配置网络设备的基础信息', bg='green', fg='white')
+        infor4.pack()
 
+        init_config = tk.Button(self.root, text="初始配置", command=lambda :self.db.must_config())
+        init_config.pack()
+
+        infor5 = tk.Label(self.root, text='点击后将配置设备互联地址', bg='green', fg='white')
+        infor5.pack()
+
+        connect_address = tk.Button(self.root, text='互联地址', command=lambda :self.db.connect_ipaddress())
+        connect_address.pack()
+
+        # 修改为使用self.button_list
+        for text, command in self.button_list:
+            button = tk.Button(
+                self.root, 
+                text=text, 
+                bg='green', 
+                fg='white',
+                command=command
+            )
+            self.action_buttons.append(button)
+    
     def device_list(self):
         frame = ttk.Frame(self.root)
         frame.pack(pady=10)
@@ -154,7 +176,7 @@ class netconfapp_gui:
         ip_entry.grid(row=0, column=1)
 
         ttk.Label(device_windows, text='设备类型:').grid(row=1, column=0)
-        device_type_combo = ttk.Combobox(device_windows, values=['核心设备', '边界网关', '接入设备'])
+        device_type_combo = ttk.Combobox(device_windows, values=['核心设备', '边界设备', '接入设备'])
         device_type_combo.current(0)
         device_type_combo.grid(row=1, column=1)
 
@@ -196,15 +218,20 @@ class netconfapp_gui:
 
     def show_buttons(self):
         if self.contralized.get():
-            for button in action_buttons:
+            for button in self.action_buttons:
                 button.pack()
         else:
-            for button in action_buttons:
+
+            for button in self.action_buttons:
+
                 button.pack_forget()
 
     def create_console(self):
+
         """创建日志输出控制台"""
+
         console_frame = ttk.Frame(self.root)
+
         console_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         # 控制台标签
@@ -224,3 +251,21 @@ class netconfapp_gui:
         self.console_text.insert(tk.END, message + "\n")
         self.console_text.see(tk.END)  # 自动滚动到底部
         self.console_text.configure(state='disabled')
+
+    def configure_ospf(self):
+        """打开OSPF配置窗口"""
+        ospf = ospf_auto(self.db)  # 传入数据库实例
+        ospf.ospf_gui(self.root)  # 打开OSPF配置窗口
+        self.log_message("正在配置OSPF...")
+
+    def configure_bgp_evpn(self):
+        """打开BGP EVPN配置窗口"""
+        vxlan = vx(self.db)
+        vxlan.bgp_evpn_gui(self.root)
+        self.log_message("正在配置BGP EVPN...")
+
+    def configure_vxlan_gateway(self):
+        """打开VXLAN网关配置窗口"""
+        vxlan = vx(self.db)
+        vxlan.vxlan_gateway_gui(self.root)
+        self.log_message("正在配置VXLAN集中式网关...")
