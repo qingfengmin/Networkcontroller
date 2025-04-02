@@ -15,7 +15,7 @@ class netconfapp_gui:
         self.root.geometry('800x800')
         # 确保在 __init__ 方法中正确初始化 setting 属性
         self.setting = setting()
-        self.db = db()
+        self.db = db(self.setting)
         self.button_list = [
             ('配置OSPF', self.configure_ospf),
             ('配置BGP_EVPN', self.configure_bgp_evpn),
