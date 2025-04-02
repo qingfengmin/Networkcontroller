@@ -87,19 +87,19 @@ class config:
 
     def vxlan_BD(self, bd_id, vni):
         vxlan_core = f'''
-               <config>
+    <config>
       <evc xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <bds>
           <bd operation="merge">
             <bdId>{bd_id}</bdId>
-            <bdDesc>bd1</bdDesc>
             <statistic>disable</statistic>
             <macLearn>enable</macLearn>
           </bd>
         </bds>
       </evc>
     </config>
-''', f'''
+'''
+        bd_vni = f'''
     <config>
       <nvo3 xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <nvo3Vni2Bds>
@@ -110,7 +110,8 @@ class config:
         </nvo3Vni2Bds>
       </nvo3>
     </config>
-''', f'''
+'''
+        vxlan = f'''
     <config>
       <nvo3 xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <nvo3Nves>
@@ -127,57 +128,51 @@ class config:
       </nvo3>
     </config>
 '''
-        core_RT = f'''
+        return vxlan_core,bd_vni,vxlan
+
+    def l3evpn(self, bd_id,RD,export_rt,import_rt):
+        ex_RT = f'''
     <config>
       <evpn xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <evpnInstances>
           <evpnInstance operation="merge">
-            <evpnName>1</evpnName>
+            <evpnName>{bd_id}</evpnName>
             <bdId>{bd_id}</bdId>
-            <evpnDescription>aaa</evpnDescription>
-            <evpnRD>{self.RD}</evpnRD>
-            <evpnType>normal</evpnType>
-            <imPolicyName>imPolicyName</imPolicyName>
-            <exPolicyName>exPolicyName</exPolicyName>
-            <evpnRTs>
+            <evpnRD>{RD}</evpnRD>
+			<evpnRTs>
               <evpnRT operation="merge">
+                <vrfRTValue>{export_rt}</vrfRTValue>
                 <vrfRTType>export_extcommunity</vrfRTType>
-                <vrfRTValue>{self.vpn_RT}</vrfRTValue>
+				<vrfRTValue>2:2</vrfRTValue>
                 <vrfRTType>import_extcommunity</vrfRTType>
-                <vrfRTValue>{self.vpn_RT1}</vrfRTValue>
-            </evpnRT>
+              </evpnRT>
             </evpnRTs>
           </evpnInstance>
         </evpnInstances>
       </evpn>
     </config>
 '''
-        boundary_RT = f'''
-            <config>
+        im_rt = f'''
+    <config>
       <evpn xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <evpnInstances>
           <evpnInstance operation="merge">
-            <evpnName>1</evpnName>
+            <evpnName>{bd_id}</evpnName>
             <bdId>{bd_id}</bdId>
-            <evpnDescription>aaa</evpnDescription>
-            <evpnRD>{self.RD}</evpnRD>
-            <evpnType>normal</evpnType>
-            <imPolicyName>imPolicyName</imPolicyName>
-            <exPolicyName>exPolicyName</exPolicyName>
-            <evpnRTs>
+            <evpnRD>{RD}</evpnRD>
+			<evpnRTs>
               <evpnRT operation="merge">
-                <vrfRTType>export_extcommunity</vrfRTType>
-                <vrfRTValue>{self.vpn_RT1}</vrfRTValue>
+				<vrfRTValue>{import_rt}</vrfRTValue>
                 <vrfRTType>import_extcommunity</vrfRTType>
-                <vrfRTValue>{self.vpn_RT}</vrfRTValue>
-            </evpnRT>
+              </evpnRT>
             </evpnRTs>
           </evpnInstance>
         </evpnInstances>
       </evpn>
     </config>
 '''
-        return vxlan_core, core_RT, boundary_RT
+
+        return  ex_RT,im_rt
 
     def nve_source(self, address: str):
         nve = f'''
@@ -218,7 +213,7 @@ class config:
         '''
         return bgp_template
 
-    def bgp_neighbor(self, address, interface):
+    def bgp_neighbor(self, address,fixed_as, interface):
         bgp_neighbor = f'''
     <config>
       <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
@@ -238,7 +233,8 @@ class config:
         </bgpcomm>
       </bgp>
     </config>
-        ''', f'''
+        '''
+        evpn = f'''
     <config>
       <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <bgpcomm>
@@ -252,7 +248,7 @@ class config:
                   <peerAFs>
                     <peerAF operation="merge">
                       <remoteAddress>{address}</remoteAddress>
-                      <advertiseArp>True</advertiseArp>
+                      <advertiseArp>true</advertiseArp>
                       <allowAsLoopEnable>false</allowAsLoopEnable>
                     </peerAF>
                   </peerAFs>
@@ -263,8 +259,9 @@ class config:
         </bgpcomm>
       </bgp>
     </config>
-        '''+ f'''
-            <config>
+     '''
+        ipv4_un =   f'''
+    <config>
       <bgp xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
         <bgpcomm>
           <bgpVrfs>
@@ -286,7 +283,8 @@ class config:
       </bgp>
     </config>
         '''
-        return bgp_neighbor
+
+        return bgp_neighbor,evpn,ipv4_un
 
     def create_vlan(self, vlanid):
         vlan = f'''
@@ -374,5 +372,23 @@ generic = {'int_filter':'''
         </lldpInterfaces>
       </lldp>
     </filter>
+''','evpn_overlay':'''
+	<config>
+      <evn xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+        <evnGlobal operation="merge">
+          <evpnOverLay>true</evpnOverLay>
+        </evnGlobal>
+      </evn>
+    </config>
+''','nve1':'''
+    <config>
+       <ifm xmlns="http://www.huawei.com/netconf/vrp" content-version="1.0" format-version="1.0">
+         <interfaces>
+           <interface operation="merge">
+             <ifName>Nve1</ifName>
+           </interface>
+         </interfaces>
+       </ifm>
+    </config>
 '''}
 

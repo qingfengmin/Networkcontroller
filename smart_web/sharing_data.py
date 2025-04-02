@@ -8,7 +8,7 @@ class database:
     def __init__(self):
         self.Devices = {}
         self.__interface_infor = {}
-        self.__hostlist = {}
+        self.hostlist = {}
         self.con = config()
         self.__loopback_network = list(settings().loopback().keys())
         # self.mask = settings().subnetwork_partition().hosts
@@ -16,18 +16,18 @@ class database:
 
     def create_device(self, host, device_type):
         try:
-            self.__hostlist[host] = device_type
-            return self.__hostlist
+            self.hostlist[host] = device_type
+            return self.hostlist
         except ValueError as e:
             print(f"输入的网络地址或子网掩码无效: {e}")
             return []
 
     def delete_device(self, host):
-        if host in self.__hostlist:
-            del self.__hostlist[host]
+        if host in self.hostlist:
+            del self.hostlist[host]
 
     def init(self):
-        for host in self.__hostlist.keys():
+        for host in self.hostlist.keys():
             info = self.__neighbor(host)
             loopback_ip = random.choice(self.__loopback_network)
             self.Devices[host] = {
@@ -83,6 +83,8 @@ class database:
         list = []
         for i in devicelist:
             list.append(generic['lldp_enable'])
+            list.append(generic['evpn_overlay'])
+            list.append(generic['nve1'])
             loopback_ip = self.Devices[i]['loopback_ip']
             list.append(self.con.interface_addrsss(f'loopback0',loopback_ip, '255.255.255.255'))
             for j in list:
@@ -174,34 +176,49 @@ class database:
             vlan_config[host_ip] = {
                 'devices_name': info['devices_name'],
                 'loopback_ip': self.Devices.get(host_ip, {}).get('loopback_ip', ''),
+                'vlanif': {},
                 'interface': {},
-                'vlanif': {}
+                'bgppeer': {}
             }
 
             for interface, neighbor_device in interfaces.items():
-                neighbor_host = next((ip for ip, data in lldp_info.items() if data['devices_name'] == neighbor_device), None)
-                link = tuple(sorted([(host_ip, interface), (neighbor_host, next(iface for iface, dev in lldp_info[neighbor_host]['interface'].items() if dev == info['devices_name']))]))
+                neighbor_host = next((ip for ip, data in lldp_info.items() 
+                                    if data['devices_name'] == neighbor_device), None)
+                
+                # 生成链路标识(确保双向链路使用相同VLAN)
+                link = tuple(sorted([
+                    (host_ip, interface), 
+                    (neighbor_host, next(
+                        iface for iface, dev in lldp_info[neighbor_host]['interface'].items() 
+                        if dev == info['devices_name']
+                    ))
+                ]))
 
+                # 分配VLAN
                 vlan = assigned_vlans.get(link) or random.choice(vlan_range)
                 assigned_vlans[link] = vlan
                 vlan_config[host_ip]['interface'][interface] = vlan
 
+                # 分配IP地址
                 if vlan not in vlan_ip_networks:
                     if subnets:
                         vlan_ip_networks[vlan] = subnets.pop(0)
                     else:
-                        print("没有可用的子网。")
                         continue
 
                 ip_network = vlan_ip_networks.get(vlan)
                 ip_generator = ip_network.hosts()
                 ip = next((ip for ip in ip_generator if str(ip) not in assigned_ips), None)
-
-                if not ip:
-                    print(f"VLAN {vlan} 网段中没有可用的 IP 地址了。")
-                    continue
-
-                assigned_ips.add(str(ip))
-                vlan_config[host_ip]['vlanif'][vlan] = str(ip)
+                
+                if ip:
+                    assigned_ips.add(str(ip))
+                    vlan_config[host_ip]['vlanif'][vlan] = str(ip)
+                
+                # 添加BGP邻居信息
+                if neighbor_host:
+                    neighbor_loopback = self.Devices.get(neighbor_host, {}).get('loopback_ip', '')
+                    print(neighbor_loopback)
+                    if neighbor_loopback:
+                        vlan_config[host_ip]['bgppeer'][interface] = neighbor_loopback
 
         return vlan_config
