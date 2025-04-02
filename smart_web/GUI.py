@@ -1,21 +1,20 @@
 import tkinter as tk
 from tkinter import messagebox
 from setting_config import config_data as setting
-import netconf_session as ncs
 from tkinter import ttk
 from sharing_data import database as db
 from ospf_auto import ospf_auto
 from VXlan_auto import vxlan_auto as vx
 
 class netconfapp_gui:
-    def __init__(self, root):
-        self.db = db()  # 创建database实例 # 设置日志回调
+    def __init__(self, root):  # 创建database实例 # 设置日志回调
         self.root = root
         self.root.title('初代python控制器')
         self.root.geometry('800x800')
         # 确保在 __init__ 方法中正确初始化 setting 属性
-        self.setting = setting()
-        self.db = db(self.setting)
+        self.settings = setting
+        self.db = db(self.settings)
+        self.setting = self.settings()
         self.button_list = [
             ('配置OSPF', self.configure_ospf),
             ('配置BGP_EVPN', self.configure_bgp_evpn),

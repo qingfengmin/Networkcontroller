@@ -1,37 +1,20 @@
-from setting_config import config_data as settings
 from netconf_session import netconf_auto as nc
 from Configuring_the_database import generic,config
 import random
 
 class database:
-    def __init__(self):
+    def __init__(self,settings):
         self.Devices = {}
         self.__interface_infor = {}
         self.hostlist = {}
         self.con = config()
         self.__loopback_network = list(settings().loopback().keys())
         self.gui_logger = None  # 新增GUI日志引用
+        self.settings = settings()
 
     def set_gui_logger(self, logger_func):
         """设置GUI日志函数"""
         self.gui_logger = logger_func
-
-    def must_config(self):
-        devicelist = self.Devices.keys()
-        list = []
-        for i in devicelist:
-            list.append(generic['lldp_enable'])
-            list.append(generic['evpn_overlay'])
-            list.append(generic['nve1'])
-            loopback_ip = self.Devices[i]['loopback_ip']
-            list.append(self.con.interface_addrsss(f'loopback0',loopback_ip, '255.255.255.255'))
-            for j in list:
-                out = nc(i).dly_key(j)
-                if self.gui_logger:
-                    self.gui_logger(str(out))  # 使用GUI日志
-                else:
-                    print(out)  # 保留终端输出
-            list.clear()
 
     def create_device(self, host, device_type):
         try:
@@ -95,7 +78,7 @@ class database:
 
             output.append("-"*90)
         output.append("="*100 + "\n")
-        return '\n'.join(output)  # <mcsymbol name="get_device" filename="sharing_data.py" path="e:\项目\pythonproject\smart_web\sharing_data.py" startline="36" type="function"></mcsymbol>
+        return '\n'.join(output)
 
     def must_config(self):
         devicelist = self.Devices.keys()
@@ -183,8 +166,8 @@ class database:
 
     def __generate_vlan_config(self, lldp_info):
         # 直接获取最新配置
-        vlan_range = settings().vlan()
-        subnets = settings().subnetwork_partition()
+        vlan_range = self.settings.vlan()
+        subnets = self.settings.subnetwork_partition()
         assigned_vlans = {}
         vlan_ip_networks = {}
         assigned_ips = set()
