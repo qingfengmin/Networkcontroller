@@ -112,7 +112,7 @@ class vxlan_auto:
             if self.host[z] == '核心设备':
                 configs.extend(self.con.l3evpn(bd_id, RD, export_rt, import_rt))
                 configs.append(self.con.interface_addrsss(f'vbdif{bd_id}',address,mask))
-            if self.host[z] == '':
+            if self.host[z] == '边界设备':
                 configs.extend(self.con.l3evpn(bd_id, RD, import_rt, export_rt))
             for xml in configs:
                 print(ncs(z).dly_key(xml))
