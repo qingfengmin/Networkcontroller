@@ -90,6 +90,4 @@ class netconf_auto:
                         break
 
         return sys_name, interface_mapping
-if __name__ == '__main__':
-    meirui = netconf_auto('192.168.100.101').get_interfaces()
-    print(meirui)
+
