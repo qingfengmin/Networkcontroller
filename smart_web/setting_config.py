@@ -85,9 +85,4 @@ class config_data:
             print(f"输入的网络地址或子网掩码无效: {e}")
             return []
 
-if __name__ == '__main__':
-    meirui = config_data().subnetwork_partition()
-    print(meirui)
-
-
 
