@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能一配置</title>
+    <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-8">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+        <div class="flex justify-between items-center mb-8 gap-4">
+            <a href="config.html" class="text-2xl font-bold hover:underline">返回配置中心</a>
+        </div>
+        <form id="resourceForm">
+            <label for="resource" class="block text-sm font-medium text-gray-700">资源名称</label>
+            <input type="text" id="resource" name="resource" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="bd_before" class="block text-sm font-medium text-gray-700 mt-2">BD 起始值</label>
+            <input type="text" id="bd_before" name="bd_before" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="bd_after" class="block text-sm font-medium text-gray-700 mt-2">BD 结束值</label>
+            <input type="text" id="bd_after" name="bd_after" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="vni_before" class="block text-sm font-medium text-gray-700 mt-2">VNI 起始值</label>
+            <input type="text" id="vni_before" name="vni_before" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="vni_after" class="block text-sm font-medium text-gray-700 mt-2">VNI 结束值</label>
+            <input type="text" id="vni_after" name="vni_after" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="vlan_before" class="block text-sm font-medium text-gray-700 mt-2">VLAN 起始值</label>
+            <input type="text" id="vlan_before" name="vlan_before" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="vlan_after" class="block text-sm font-medium text-gray-700 mt-2">VLAN 结束值</label>
+            <input type="text" id="vlan_after" name="vlan_after" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="ip_address" class="block text-sm font-medium text-gray-700 mt-2">IP 地址</label>
+            <input type="text" id="ip_address" name="ip_address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="ip_mask" class="block text-sm font-medium text-gray-700 mt-2">IP 掩码</label>
+            <input type="text" id="ip_mask" name="ip_mask" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <button type="button" onclick="submitResourceForm()" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">提交</button>
+        </form>
+    </div>
+    <script src="{{ url_for ('static',filename='js/first.js')}}"></script>
+</body>
+</html>

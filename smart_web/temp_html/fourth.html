@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>路由协议配置</title>
+    <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-8">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+            <div class="flex justify-between items-center mb-8 gap-4">
+                <a href="config.html" class="text-2xl font-bold hover:underline">
+                    <i class="fas fa-arrow-left mr-2"></i>返回配置中心
+                </a>
+            </div>
+        <!-- OSPF配置表单 -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">OSPF配置</h2>
+            <form id="ospfForm" onsubmit="event.preventDefault(); submitOSPF();">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">进程ID</label>
+                    <input type="number" id="ospfProcess" class="input-field" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">区域ID</label>
+                    <input type="text" id="ospfArea" class="input-field" required>
+                </div>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded w-full hover:bg-blue-600 transition-colors">提交配置</button>
+            </form>
+            <div id="ospfMessage" class="text-red-500 mt-2 text-sm"></div>
+        </div>
+
+        <!-- BGP配置表单 -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4">BGP配置</h2>
+            <form id="bgpForm" onsubmit="event.preventDefault(); submitBGP();">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">AS号</label>
+                    <input type="number" id="bgpAS" class="input-field" required>
+                </div>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded w-full hover:bg-blue-600 transition-colors">提交配置</button>
+            </form>
+            <div id="bgpMessage" class="mt-4 text-sm"></div>
+        </div>
+    </div>
+    <script src="{{ url_for ('static',filename='js/fourth.js')}}"></script>
+</body>
+</html>

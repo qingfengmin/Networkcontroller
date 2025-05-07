@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理主页</title>
+<link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded shadow-md w-96">
+        <h1 class="text-2xl font-bold mb-4">用户管理</h1>
+        <a href="register.html" class="block bg-blue-500 text-white py-2 px-4 rounded mb-2 text-center hover:bg-blue-600">创建用户</a>
+        <a href="login.html" class="block bg-green-500 text-white py-2 px-4 rounded mb-2 text-center hover:bg-green-600">用户登录</a>
+        <a href="reset_password.html" class="block bg-yellow-500 text-white py-2 px-4 rounded text-center hover:bg-yellow-600">重置密码</a>
+    </div>
+</body>
+
+</html>

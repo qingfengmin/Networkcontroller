@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VXLAN网关配置</title>
+    <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-8">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+        <div class="flex justify-between items-center mb-8 gap-4">
+            <a href="config.html" class="text-2xl font-bold hover:underline">返回配置中心</a>
+        </div>
+        
+        <form id="vxlanForm" class="space-y-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">BD ID</label>
+                    <input type="number" name="bd_id" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">VNI</label>
+                    <input type="number" name="vni" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">路由标识符 (RD)</label>
+                    <input type="text" name="RD" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Import RT</label>
+                    <input type="text" name="import_rt" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Export RT</label>
+                    <input type="text" name="export_rt" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">网关地址</label>
+                    <input type="text" name="address" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">子网掩码</label>
+                    <input type="text" name="mask" value="255.255.255.0" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <button type="button" onclick="submitVxlanForm()" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                提交配置
+            </button>
+            <div id="vxlanMessage" class="text-red-500 text-center"></div>
+        </form>
+    </div>
+    <script src="{{ url_for ('static',filename='js/fifth.js')}}"></script>
+</body>
+</html>

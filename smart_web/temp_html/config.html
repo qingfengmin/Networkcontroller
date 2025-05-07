@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户配置中心</title>
+    <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-8">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+        <div class="flex justify-between items-center mb-8 gap-4">
+            <a href="login.html" class="text-2xl font-bold hover:underline">用户配置中心</a>
+            <button onclick="logout()" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
+                <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 功能区块 -->
+            <div class="bg-blue-50 p-6 rounded-lg" onclick="window.location.href='first.html'">
+                <h2 class="text-lg font-semibold mb-4">资源配置</h2>
+                <p class="text-gray-600">自动部署的第一步,先配置资源</p>
+            </div>
+
+            <div class="bg-green-50 p-6 rounded-lg" onclick="window.location.href='device_management.html'">
+                <h2 class="text-lg font-semibold mb-4">设备管理</h2>
+                <p class="text-gray-600">可以添加设备,也可以删除设备</p>
+            </div>
+
+            <div class="bg-orange-50 p-6 rounded-lg" onclick="window.location.href='third.html'">
+                <h2 class="text-lg font-semibold mb-4">设备初始化配置</h2>
+                <p class="text-gray-600">完成设备初始化、必须配置和连接地址配置</p>
+            </div>
+
+            <div class="bg-purple-50 p-6 rounded-lg" onclick="window.location.href='fourth.html'">
+                <h2 class="text-lg font-semibold mb-4">路由协议配置</h2>
+                <p class="text-gray-600">可以配置OSPF以及BGP路由协议</p>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-lg" onclick="window.location.href='fifth.html'">
+                <h2 class="text-lg font-semibold mb-4">VXLAN网关配置</h2>
+                <p class="text-gray-600">配置VXLAN隧道参数、BD标识符和路由目标</p>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for ('static',filename='js/script.js')}}"></script>
+</body>
+</html>

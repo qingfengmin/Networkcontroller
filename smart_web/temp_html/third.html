@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备初始化配置</title>
+    <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-8">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+        <div class="flex justify-between items-center mb-8 gap-4">
+            <a href="config.html" class="text-2xl font-bold hover:underline">返回配置中心</a>
+        </div>
+        
+        <div class="space-y-8">
+            <!-- 初始化配置 -->
+            <div class="bg-blue-50 p-6 rounded-lg">
+                <h2 class="text-lg font-semibold mb-4">设备初始化</h2>
+                <button onclick="initDevice()" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                    执行初始化
+                </button>
+                <div id="initMessage" class="text-red-500 mt-2"></div>
+            </div>
+
+            <!-- 必须配置 -->
+            <div class="bg-green-50 p-6 rounded-lg">
+                <h2 class="text-lg font-semibold mb-4">必须配置</h2>
+                <button onclick="mustConfig()" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                    执行配置
+                </button>
+                <div id="mustMessage" class="text-red-500 mt-2"></div>
+            </div>
+
+            <!-- 连接地址配置 -->
+            <div class="bg-yellow-50 p-6 rounded-lg">
+                <h2 class="text-lg font-semibold mb-4">连接地址配置</h2>
+                <button onclick="connectAddress()" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">
+                    执行配置
+                </button>
+                <div id="connectMessage" class="text-red-500 mt-2"></div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for ('static',filename='js/third.js')}}"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理</title>
+    <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css')}}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-8">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-4xl">
+        <div class="flex justify-between items-center mb-8 gap-4">
+            <a href="config.html" class="text-2xl font-bold hover:underline">返回配置中心</a>
+        </div>
+        <h2 class="text-lg font-semibold mb-4">添加设备</h2>
+        <form id="addDeviceForm">
+            <label for="deviceName" class="block text-sm font-medium text-gray-700">设备名称</label>
+            <input type="text" id="deviceName" name="deviceName" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <label for="deviceType" class="block text-sm font-medium text-gray-700 mt-2">设备类型</label>
+            <select id="deviceType" name="deviceType" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option value="核心设备">核心设备</option>
+                <option value="边界设备">边界设备</option>
+                <option value="扩展设备">扩展设备</option>
+            </select>
+            <button type="button" onclick="addDevice()" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">添加设备</button>
+        </form>
+        <h2 class="text-lg font-semibold mt-8 mb-4">设备列表</h2>
+        <ul id="deviceList"></ul>
+    </div>
+    <script src="{{ url_for ('static',filename='js/device_management.js')}}"></script>
+</body>
+</html>
