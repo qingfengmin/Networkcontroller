@@ -5,7 +5,7 @@ class reamysql:
         self.user = {
             'host': 'localhost',
             'user': 'root',
-            'password': '123456',
+            'password': 'yourspaddword',
             'database': 'route'
         }
         self.table = 'devices_resource'
